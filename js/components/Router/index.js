@@ -75,7 +75,6 @@ function reducer(options) {
                 };
                 break;
             case options.type+".afterpop":
-                console.log("AFTERPOP STATE: ", action.state);
                 state = {
                     current: action.state, 
                 }

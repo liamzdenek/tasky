@@ -1,14 +1,16 @@
-import {Router, Route, redirect, redirect_now} from 'components/RouterSingleton';
-
 const {element} = require('deku')
+
+import {Router, Route, redirect, redirect_now} from 'components/RouterSingleton';
+import Login from 'components/Login';
+
+
 
 let App = {
 	render: ({context, dispatch}) => {
 		console.log("APP SENDING HELLO WORLD");
 		return <Router router={context.router}>
 			<Route match="/">
-				Hello Index
-				<a onClick={redirect(dispatch, "/edit")}>To Edit</a>
+                <Login/>
 			</Route>
 			<Route match="/edit">
 				Hello Edit
