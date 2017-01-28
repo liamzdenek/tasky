@@ -1,4 +1,4 @@
-const Deku = require('deku')
+import Deku, {element} from 'deku'
 
 let Route = {
 	render: ({children, props}) => {
@@ -48,31 +48,39 @@ function reducer(options) {
     }, options);
     
     return (state, action) => {
-        state = state || {
-            current: options.defaultRoute,
-            history: [],
-        };
+        if(!state) {
+            let route = history.state
+            if(window.location.hash) {
+                route = {
+                    uri: window.location.hash.slice(2),
+                    props: {},
+                }
+            }
+            route = route || options.defaultRoute;
+            window.history.replaceState(route, "", "#!"+route.uri);
+            state = {
+                current: route,
+            };
+        }
 
         switch(action.type) {
             case options.type+".push":
-				current = {
+				let current = {
 					uri: action.uri,
 					props: action.props,
 				} 
-				window.history.pushState(current, "", "#!/"+current.uri);
+				window.history.pushState(current, "", "#!"+current.uri);
                 state = {
                     current,
-                    history: [
-                        state.current,
-                        ...state.history.slice(0, options.maxHistory-1), // -1 for the line above
-                    ]
                 };
                 break;
-            case options.type+".pop":
+            case options.type+".afterpop":
+                console.log("AFTERPOP STATE: ", action.state);
                 state = {
-                    current: state.history[0],
-                    history: state.history.slice(1), // -1 for the line above
+                    current: action.state, 
                 }
+            case options.type+".pop":
+                //window.history.back();
         }
 
         return state;
@@ -95,6 +103,15 @@ function get_redirectors(prefix) {
 
 }
 
+function setup_router(prefix, dispatch) {
+    window.onpopstate = function(ev) {
+        console.log("POPSTATE EV: ", ev);
+        dispatch({
+            type: prefix+".afterpop",
+            state: ev.state,
+        })
+    }
+}
 
 export default Router;
 export {
@@ -102,4 +119,5 @@ export {
     Route,
     reducer,
     get_redirectors,
+    setup_router,
 }

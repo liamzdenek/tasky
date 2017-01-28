@@ -2,6 +2,10 @@ const Router = require('components/Router');
 
 console.log("ROUTER: ", Router);
 
-let exports = Object.assign({}, Router, Router.get_redirectors('router'));
+let prefix = 'router';
+
+let exports = Object.assign({}, Router, Router.get_redirectors(prefix));
+
+exports.setup_router = exports.setup_router.bind(null, prefix);
 
 module.exports = exports;

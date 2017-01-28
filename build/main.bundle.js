@@ -273,6 +273,25 @@ var createPath = exports.createPath = function createPath() {
 "use strict";
 'use strict';
 
+var Router = __webpack_require__(19);
+
+console.log("ROUTER: ", Router);
+
+var prefix = 'router';
+
+var _exports = Object.assign({}, Router, Router.get_redirectors(prefix));
+
+_exports.setup_router = _exports.setup_router.bind(null, prefix);
+
+module.exports = _exports;
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -488,7 +507,7 @@ function diffNode(prev, next, path) {
 }
 
 /***/ },
-/* 2 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -499,7 +518,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.h = exports.dom = exports.diff = exports.vnode = exports.string = exports.element = exports.createApp = undefined;
 
-var _diff = __webpack_require__(1);
+var _diff = __webpack_require__(2);
 
 var diff = _interopRequireWildcard(_diff);
 
@@ -542,21 +561,6 @@ exports.vnode = vnode;
 exports.diff = diff;
 exports.dom = dom;
 exports.h = h;
-
-/***/ },
-/* 3 */
-/***/ function(module, exports, __webpack_require__) {
-
-"use strict";
-'use strict';
-
-var Router = __webpack_require__(19);
-
-console.log("ROUTER: ", Router);
-
-var _exports = Object.assign({}, Router, Router.get_redirectors('router'));
-
-module.exports = _exports;
 
 /***/ },
 /* 4 */
@@ -1643,7 +1647,7 @@ module.exports = g;
 "use strict";
 'use strict';
 
-var _deku = __webpack_require__(2);
+var _deku = __webpack_require__(3);
 
 var _deku2 = _interopRequireDefault(_deku);
 
@@ -1653,6 +1657,8 @@ var _reducer = __webpack_require__(20);
 
 var _reducer2 = _interopRequireDefault(_reducer);
 
+var _RouterSingleton = __webpack_require__(1);
+
 var _App = __webpack_require__(18);
 
 var _App2 = _interopRequireDefault(_App);
@@ -1660,12 +1666,16 @@ var _App2 = _interopRequireDefault(_App);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Create a Redux store to handle all UI actions and side-effects
-var store = (0, _redux.createStore)((0, _reducer2.default)());
+//let store = createStore(reducer())
+
+var store = (0, _redux.createStore)((0, _reducer2.default)(), window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
 
 // Create an app that can turn vnodes into real DOM elements
 var render = (0, _deku.createApp)(document.body, store.dispatch);
 
 console.log("STORE: ", store);
+
+(0, _RouterSingleton.setup_router)(store.dispatch);
 
 // Update the page and add redux state to the context
 function draw() {
@@ -1689,9 +1699,9 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _RouterSingleton = __webpack_require__(3);
+var _RouterSingleton = __webpack_require__(1);
 
-var _require = __webpack_require__(2),
+var _require = __webpack_require__(3),
     element = _require.element;
 
 var App = {
@@ -1734,10 +1744,13 @@ exports.default = App;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.setup_router = exports.get_redirectors = exports.reducer = exports.Route = exports.Router = undefined;
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+var _deku = __webpack_require__(3);
 
-var Deku = __webpack_require__(2);
+var _deku2 = _interopRequireDefault(_deku);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Route = {
     render: function render(_ref) {
@@ -1750,7 +1763,7 @@ var Route = {
         if (children.length == 1) {
             return children[0];
         }
-        return element(
+        return (0, _deku.element)(
             "div",
             null,
             children
@@ -1799,27 +1812,39 @@ function reducer(options) {
     }, options);
 
     return function (state, action) {
-        state = state || {
-            current: options.defaultRoute,
-            history: []
-        };
+        if (!state) {
+            var route = history.state;
+            if (window.location.hash) {
+                route = {
+                    uri: window.location.hash.slice(2),
+                    props: {}
+                };
+            }
+            route = route || options.defaultRoute;
+            window.history.replaceState(route, "", "#!" + route.uri);
+            state = {
+                current: route
+            };
+        }
 
         switch (action.type) {
             case options.type + ".push":
-                current = {
+                var current = {
                     uri: action.uri,
                     props: action.props
                 };
-                window.history.pushState(current, "", "#!/" + current.uri);
+                window.history.pushState(current, "", "#!" + current.uri);
                 state = {
-                    current: current,
-                    history: [state.current].concat(_toConsumableArray(state.history.slice(0, options.maxHistory - 1)))
+                    current: current
                 };
                 break;
-            case options.type + ".pop":
+            case options.type + ".afterpop":
+                console.log("AFTERPOP STATE: ", action.state);
                 state = {
-                    current: state.history[0],
-                    history: state.history.slice(1) };
+                    current: action.state
+                };
+            case options.type + ".pop":
+            //window.history.back();
         }
 
         return state;
@@ -1847,11 +1872,22 @@ function get_redirectors(prefix) {
     };
 }
 
+function setup_router(prefix, dispatch) {
+    window.onpopstate = function (ev) {
+        console.log("POPSTATE EV: ", ev);
+        dispatch({
+            type: prefix + ".afterpop",
+            state: ev.state
+        });
+    };
+}
+
 exports.default = Router;
 exports.Router = Router;
 exports.Route = Route;
 exports.reducer = reducer;
 exports.get_redirectors = get_redirectors;
+exports.setup_router = setup_router;
 
 /***/ },
 /* 20 */
@@ -1873,7 +1909,7 @@ exports.default = function () {
 
 var _redux = __webpack_require__(14);
 
-var router = __webpack_require__(3).reducer;
+var router = __webpack_require__(1).reducer;
 
 function counter(type) {
     return function (state, action) {
@@ -1955,7 +1991,7 @@ var _dom = __webpack_require__(5);
 
 var dom = _interopRequireWildcard(_dom);
 
-var _diff = __webpack_require__(1);
+var _diff = __webpack_require__(2);
 
 function _interopRequireWildcard(obj) {
   if (obj && obj.__esModule) {
@@ -2130,7 +2166,7 @@ var _create = __webpack_require__(4);
 
 var _create2 = _interopRequireDefault(_create);
 
-var _diff = __webpack_require__(1);
+var _diff = __webpack_require__(2);
 
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : { default: obj };
