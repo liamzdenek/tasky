@@ -7,7 +7,6 @@ import Login from 'components/Login';
 
 let App = {
 	render: ({context, dispatch}) => {
-		console.log("APP SENDING HELLO WORLD");
 		return <Router router={context.router}>
 			<Route match="/">
                 <Login/>

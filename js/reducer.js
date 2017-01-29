@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';    
 
 let router = require('components/RouterSingleton').reducer;
+let form = require('components/Form').reducer;
 
 function counter(type) {
     return (state, action) => {
@@ -16,5 +17,6 @@ export default function() {
     return combineReducers({
         counter: counter("CLICKED"),
 		router: router(),
+		form,
     })
 }

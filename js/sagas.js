@@ -3,21 +3,23 @@ import { call, put, takeEvery } from 'redux-saga/effects'
 
 export const BASE_URL = "http://localhost:3000";
 
-export function http_jsonapi(uri, init) {
+export function* http_jsonapi(uri, init) {
     let myinit = {
         headers: {
             "Content-Type": "application/vnd.api+json",
         },
         body: init.json ? JSON.stringify(init.json) : null,
-    };
+    }
     myinit = Object.assign(myinit, init);
-    return fetch(uri, myinit);
+    let response = yield fetch(uri, myinit);
+	let body = yield response.text();
+	return [response, JSON.parse(body)]
 }
 
 // Our worker Saga: will perform the async increment task
 export function* http_login(action) {
 	console.log("ACTION: ", action);
-	let result = yield call(http_jsonapi, BASE_URL+'/session', {
+	let [response, data] = yield call(http_jsonapi, BASE_URL+'/session', {
         method: 'POST',
         json: {
             data: {
@@ -29,10 +31,7 @@ export function* http_login(action) {
             }
         }
 	})
-	console.log("RESULT: ", result);
-	let body = yield result.text();
-	console.log("BODY: ", body);
-	console.log("BODY: ", body.slice());
+	console.log("DATA: ", data);
 
 	yield delay(1000)
 	yield put({ type: 'INCREMENT' })
