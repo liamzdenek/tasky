@@ -15,10 +15,13 @@
   "scripts": {
     "babel": "babel --presets es2015 js/main.js -o build/main.bundle.js",
     "start": "http-server",
-    "webpack": "webpack"
+    "webpack": "webpack",
+    "webpack-watch": "webpack --watch"
   },
   "dependencies": {
+    "autolinker": "^1.4.0",
     "deku": "^2.0.0-rc16",
+    "deku-forms": "^1.7.0",
     "redux": "^3.6.0",
     "redux-immutable": "^3.0.10",
     "redux-saga": "^0.14.3"

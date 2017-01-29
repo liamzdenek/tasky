@@ -29,10 +29,8 @@ CREATE TABLE user__org__membership (
 CREATE TABLE org (
 	id BIGINT AUTO_INCREMENT NOT NULL
 	,name VARCHAR(128) NOT NULL
-	--,subdomain VARCHAR(128) NOT NULL
 
 	,PRIMARY KEY(id)
-	--,INDEX(subdomain)
 );
 
 CREATE TABLE sprint (
