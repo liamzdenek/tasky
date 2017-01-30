@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';    
+import session from 'reducers/session';
 
 let router = require('components/RouterSingleton').reducer;
 let form = require('components/Form').reducer;
@@ -15,8 +16,9 @@ function counter(type) {
 
 export default function() {
     return combineReducers({
-        counter: counter("CLICKED"),
+        //counter: counter("CLICKED"),
 		router: router(),
 		form,
+        session,
     })
 }

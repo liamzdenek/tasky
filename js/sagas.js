@@ -1,15 +1,21 @@
 import { delay } from 'redux-saga'
-import { call, put, takeEvery } from 'redux-saga/effects'
+import { call, put, select, takeEvery } from 'redux-saga/effects'
+import { setSession } from 'reducers/session'
 
-export const BASE_URL = "http://localhost:3000";
+import {BASE_URL} from 'util/config'
 
 export function* http_jsonapi(uri, init) {
+    let session = yield select((state) => state.session);
     let myinit = {
         headers: {
             "Content-Type": "application/vnd.api+json",
         },
         body: init.json ? JSON.stringify(init.json) : null,
     }
+    if(session.token) {
+        myinit.headers["Authorization"] = "Bearer "+session.token
+    }
+
     myinit = Object.assign(myinit, init);
     let response = yield fetch(uri, myinit);
 	let body = yield response.text();
@@ -19,7 +25,7 @@ export function* http_jsonapi(uri, init) {
 // Our worker Saga: will perform the async increment task
 export function* http_login(action) {
 	console.log("ACTION: ", action);
-	let [response, data] = yield call(http_jsonapi, BASE_URL+'/session', {
+	let [response, json] = yield call(http_jsonapi, BASE_URL+'/session', {
         method: 'POST',
         json: {
             data: {
@@ -31,19 +37,35 @@ export function* http_login(action) {
             }
         }
 	})
-	console.log("DATA: ", data);
+    if(json.errors) {
+        return;
+    }
+	console.log("JSON: ", json);
 
-	yield delay(1000)
-	yield put({ type: 'INCREMENT' })
+
+	yield setSession(put, json.data.id, json.data.relationships.logged_in_as.data.id);
+
+    if(action.after) {
+        action.after(response, json);
+    }
 }
 
-// Our watcher Saga: spawn a new incrementAsync task on each INCREMENT_ASYNC
-export function* watchIncrementAsync() {
+export function* resource_require(action) {
+    console.log("SAGA RESOURCE REQUIRE");
+    return null;
+}
+
+export function* watch_http_login() {
 	yield takeEvery('HTTP_LOGIN', http_login)
+}
+
+export function* watch_resource_require() {
+	//yield takeEvery('RESOURCE_REQUIRE', resource_require)
 }
 
 export default function* rootSaga() {
 	yield [
-		watchIncrementAsync()
+		watch_http_login(),
+        watch_resource_require(),
 	]
 }

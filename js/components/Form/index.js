@@ -2,14 +2,14 @@ import {element} from 'deku'
 import validator from 'validator';
 
 export const Validators = {
-	isEmail: ({name, value, push}) => {
+	isEmail: ({value, push}) => {
 		if(!validator.isEmail(value)) {
-			push(name, "This field does not contain a valid email address");
+			push("This field does not contain a valid email address");
 		}
 	},
-	required: ({name, value, push}) => {
+	required: ({value, push}) => {
 		if(validator.isEmpty(value)) {
-			push(name, "This field cannot be empty");
+			push("This field cannot be empty");
 		}
 	}
 }
@@ -26,7 +26,7 @@ const Form = {
 	},
 	errors: (model) => {
 		let form = document.getElementById(model.path);
-		let result = {};
+		let result = [];
 		let validate = model.props.validate;
 		console.log("VALIDATORS: ", validate);
 		if(!validate) {
@@ -42,16 +42,17 @@ const Form = {
 				if(!element.name) {
 					return;
 				}
+				let name = element.name;
 				validator({
 					element,
 					form,
 					model,
 					result,
-					name: element.name,
+					name,
 					value: element.value,
-					push: (name, msg) => {
-						result[name] = result[name] || [];
-						result[name].push({
+					push: (msg) => {
+						result.push({
+							name,
 							msg,
 							validator: validator.name,
 						});
@@ -66,7 +67,7 @@ const Form = {
 	onFormSubmit: (model) => ev => {
 		ev.preventDefault();
 		let errors = Form.errors(model);
-		if(Object.keys(errors).length != 0) {
+		if(errors.length != 0) {
 			console.log("GOT ERRORS: ", errors);
 			model.dispatch({
 				type: "FORM_STATE",
@@ -109,16 +110,14 @@ export const FormStatus = {
 	render: (model) => {
 		let {context, props} = model;
 		let errors = context.form[props.name];
-		if(!errors || Object.keys(errors) == 0) {
+		if(!errors || errors.length == 0) {
 			return <div/>
 		}
 		let lis = [];
-		Object.keys(errors).forEach(field_name => {
-			let field_errors = errors[field_name]
-			for(let i in field_errors) {
-				let error = field_errors[i];
-				lis.push(<li>{field_name}: {error.msg}</li>)
-			}
+		errors.forEach((err_data) => {
+			let field_name = err_data["name"] ? err_data["name"]+": " : "";
+			let field_msg = err_data["msg"]
+			lis.push(<li>{field_name}{field_msg}</li>)
 		})
 		console.log("LIs: ", lis);
 		return <ul>{lis}</ul>;

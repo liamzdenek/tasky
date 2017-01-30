@@ -12,6 +12,12 @@ const ontrylogin = model => (fields, ev) => {
         type: "HTTP_LOGIN",
         email,
         password,
+        after: (response, json) => {
+            if(json.errors) {
+                return;
+            }
+            redirect_now(dispatch, "/dashboard");
+        }
     })
 }
 
@@ -27,8 +33,8 @@ let Login = {
             <h1>Login</h1>
 			<FormStatus name="loginform"/>
             <Form onSubmit={ontrylogin(model)} name="loginform" validate={validate}>
-                Email: <input value="test@test.com" name="email"/>
-                Password: <input value="password" type="password" name="password"/>
+                <div>Email: <input value="test2@test.com" name="email"/></div>
+                <div>Password: <input value="testaroo" type="password" name="password"/></div>
                 <input type="submit" value="Login"/>
             </Form>
         </div>

@@ -2,7 +2,7 @@ const {element} = require('deku')
 
 import {Router, Route, redirect, redirect_now} from 'components/RouterSingleton';
 import Login from 'components/Login';
-
+import Dashboard from 'components/Dashboard';
 
 
 let App = {
@@ -11,9 +11,12 @@ let App = {
 			<Route match="/">
                 <Login/>
 			</Route>
-			<Route match="/edit">
-				Hello Edit
+			<Route match="/dashboard">
+				<Dashboard/>
 			</Route>
+            <Route match="*">
+                404 route not found
+            </Route>
 		</Router>
 	}
 }
