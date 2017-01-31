@@ -11,7 +11,15 @@ export function login({context, dispatch}) {
 	return false;
 }
 
-export function require_logged_user({context, dispatch}) {
+export function logout({context, dispatch}) {
+	if(context.session && context.session.token) {
+		setTimeout(() => redirect_now(dispatch, "/dashboard"), 10);
+		return true;
+	}
+	return false;
+}
+
+export function get_logged_user({context, dispatch}) {
 	let expire = Date.now();
 	expire += 60*60*1000; // +1 hr
 	console.log("SENDING RESOURCE REQUIRE");
@@ -26,6 +34,6 @@ export function require_logged_user({context, dispatch}) {
 	}, 1);
 }
 
-export function require_logged_user_orgs({}) {
+export function get_logged_user_orgs({}) {
 
 }

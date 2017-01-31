@@ -6,8 +6,8 @@ const cond = require('util/conditions');
 
 let Dashboard = {
 	onCreate: (model) => {
-		cond.require_logged_user(model);
-		cond.require_logged_user_orgs(model);
+		cond.get_logged_user(model);
+		cond.get_logged_user_orgs(model);
 	},
 	render: (model) => {
 		let {dispatch, context} = model;

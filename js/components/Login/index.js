@@ -3,6 +3,8 @@ import {redirect, redirect_now} from 'components/RouterSingleton';
 //import {BASE_URL} from 'sagas';
 import Form, {FormStatus, Validators} from 'components/Form'
 
+const cond = require('util/conditions');
+
 console.log("FORM STATUS: ", FormStatus);
 
 const ontrylogin = model => (fields, ev) => {
@@ -25,6 +27,7 @@ const ontrylogin = model => (fields, ev) => {
 let Login = {
     render: (model) => {
         let {context, dispatch, path} = model;
+		if(cond.logout(model)) { return <div/> }
 		let validate = {
 			"email": [Validators.isEmail],
 			"password": [Validators.required],
