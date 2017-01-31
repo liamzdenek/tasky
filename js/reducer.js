@@ -23,7 +23,7 @@ export function mountReducer(add) {
 
 }
 
-export default function() {
+export default function rootReducer() {
     console.log("INITIALIZED REDUCERS: ", module.mounted);
     return combineReducers(module.mounted)
 }
