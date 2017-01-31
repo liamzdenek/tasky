@@ -1,24 +1,29 @@
 import { combineReducers } from 'redux';    
-import session from 'reducers/session';
+import session from 'components/Session';
 
 let router = require('components/RouterSingleton').reducer;
 let form = require('components/Form').reducer;
 
-function counter(type) {
-    return (state, action) => {
-        state = state || 0;
-        if(action.type == type) {
-            state = state + 1
-        }
-        return state;
+export function mountReducer(add) {
+    module.mounted = module.mounted || {};
+    
+    if(typeof add != "object" || add.constructor != Object) {
+        console.error("Cannot mount a reducer that is not a plain object");
+        return;
     }
+
+    let keys = Object.keys(add);
+    for(let i in keys) {
+        if(module.mounted[keys[i]]) {
+            console.error("Trying to mount a reducer with the same name twice: ", keys[i]);
+        }
+    }
+    console.log("MOUNTING REDUCER: ", add);
+    module.mounted = Object.assign(module.mounted, add);
+
 }
 
 export default function() {
-    return combineReducers({
-        //counter: counter("CLICKED"),
-		router: router(),
-		form,
-        session,
-    })
+    console.log("INITIALIZED REDUCERS: ", module.mounted);
+    return combineReducers(module.mounted)
 }

@@ -8,10 +8,8 @@ import App from 'components/App'
 import saga from './sagas'
 import createSagaMiddleware from 'redux-saga'
 
+
 // Create a Redux store to handle all UI actions and side-effects
-//let store = createStore(reducer())
-
-
 const sagaMiddleware = createSagaMiddleware();
 const store = createStore(
     reducer(),

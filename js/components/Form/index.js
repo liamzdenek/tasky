@@ -1,5 +1,6 @@
 import {element} from 'deku'
 import validator from 'validator';
+import {mountReducer} from 'reducer'
 
 export const Validators = {
 	isEmail: ({value, push}) => {
@@ -105,6 +106,7 @@ export function reducer(state, action) {
 	}
 	return state;
 }
+mountReducer({form: reducer});
 
 export const FormStatus = {
 	render: (model) => {

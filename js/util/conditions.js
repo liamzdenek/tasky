@@ -1,6 +1,6 @@
 import {http_jsonapi} from 'sagas'
 import {redirect, redirect_now} from 'components/RouterSingleton';
-
+import {require} from 'components/Resource'
 import {BASE_URL} from 'util/config'
 
 export function login({context, dispatch}) {
@@ -24,13 +24,12 @@ export function get_logged_user({context, dispatch}) {
 	expire += 60*60*1000; // +1 hr
 	console.log("SENDING RESOURCE REQUIRE");
 	setTimeout(() => {
-		dispatch({
-			type: "RESOURCE_REQUIRE",
+		dispatch(require({
 			resource: "users",
 			kind: "ids",
 			ids: [context.session.user_id],
 			expire,
-		})
+		}))
 	}, 1);
 }
 
