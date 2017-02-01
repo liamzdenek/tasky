@@ -9,7 +9,7 @@ export function compareRequires(r1, r2) {
 	console.log("COMPARING: ", r1, r2);
 	return r1.type == r2.type &&
 		r1.resource == r2.resource &&
-		r1.id.every((v,i) => r2.id[i] == v)
+		r1.ids.every((v,i) => r2.ids[i] == v)
 }
 
 export default function reducer(state, action) {
@@ -29,66 +29,63 @@ export default function reducer(state, action) {
 		state = Object.assign({}, state, {pending}); 
 	}
 	else if(action.type == "RESOURCE.STORE") {
+		if(state.pending) {
+			let i = state.pending.findIndex((p) => compareRequires(p, action.action));
+			let pending = [
+				...state.pending.slice(0,i),
+				...state.pending.slice(i+1)
+			]
+			state = Object.assign({}, state, {pending});
+		}
 		console.log("REDUCER GOT MATCH: ", action);		
-		let cache = Object.assign({}, state.cache ? state.cache[action.action.resource] : {});
 
 		let rows = action.json.data;
 		if(!Array.isArray(rows)) {
 			rows = [rows];
 		}
-		if(action.json.include && Array.isArray(action.json.include)) {
-			rows = rows.concat(action.json.include);
+		if(action.json.included && Array.isArray(action.json.included)) {
+			rows = rows.concat(action.json.included);
 		}
+		let cache = Object.assign({}, state.cache)
+		rows.forEach((row) => {
+			let resource_name = row.type;
+			let resource_cache = Object.assign({}, state.cache ? state.cache[resource_name] : {});
+			resource_cache[row.id] = row;
+			
+			if(resource_cache[row.id]) {
+				resource_cache[row.id].relationships = Object.assign({}, resource_cache[row.id].relationships, row.relationships)
+			}
+
+			let ncache = {};
+			ncache[resource_name] = resource_cache;
+			cache = Object.assign({}, cache, ncache);
+		})
+		state = Object.assign({}, state, {cache});
+		/*
 		for(let i in rows) {
 			let row = rows[i];
 			let nobj = {};
 			nobj[row.id] = row
+			if(cache[row.id]) {
+				nobj[row.id].relationships = Object.assign({}, cache[row.id].relationships, row.relationships)
+			}
 			cache = Object.assign({}, cache, nobj)
-		},
+		}
 
-		let nstate = {};
+		let nstate = Object.assign({}, state.cache);
 		nstate[action.action.resource] = cache;
-		state = Object.assign({}, state, nstate);
+		state = Object.assign({}, state, {cache: nstate});
+		*/
 	}
 	console.log("NEW STATE: ", state);
 	return state;
 }
 mountReducer({resource: reducer});
 
-/*
-
-	{
-		pending: [actions],
-		cache: {
-			[resourcename]: {
-				[id]: {
-					status: 'pending',
-					expire: timestamp,
-					record: [jsonapi record]
-				}
-			},
-		},
-	}
-
-*/
-
-/*
-export function require(args) {
-	args = Object.assign({
-		type: "RESOURCE.REQUIRE",
-	}, args);
-	return args;
-}
-*/
-
-
-function* watch_resource_require_ids(action) {
-}
-
 function* watch_resource_require(action) {
 	let url = BASE_URL+'/'+action.resource+'/'+action.ids.join(',');
-	if(action.related) {
-		url += '?include='+action.related.join(',');
+	if(action.include) {
+		url += '?include='+action.include.join(',');
 	}
 	let [response, json] = yield call(http_jsonapi, url, {})
     console.log("ID REQUIRE RES: ", response, json);
@@ -105,12 +102,15 @@ function* watch_resource_require(action) {
 function* watch() {
 	yield takeEvery('RESOURCE.REQUIRE', watch_resource_require)
 }
-
 mountSaga(watch);
 
 export class Dependency {
 	get instruction() { return this._instruction }
 	set instruction(i) { this._instruction = i }
+	get get() {
+		if(this._get) { return this._get }
+		return this._get = this.instruction.get();
+	}
 	constructor(instruction) {
 		this.instruction = instruction;
 	}
@@ -119,10 +119,13 @@ export class Dependency {
 		return this;
 	}
 	getDispatch() {
+		if(this.get != null) {
+			return null;
+		}
 		return this.instruction;
 	}
 	resolve() {
-		return this.instruction.get();
+		return this.get;
 	}
 	union(dep) {
 		this.ids = this.ids.concatenate(dep.ids);
@@ -149,18 +152,24 @@ export class Dependencies {
 		let firable = [];
 		for(let dep_i in this.deps) {
 			let dep = this.deps[dep_i].getDispatch();
+			if(!dep) {
+				continue;
+			}
 			let found = false;
+			/*
 			for(let tdep_i in firable) {
-				let tdep = firable[tdep_i].getDispatch();
+				let tdep = firable[tdep_i];
 				if(
 					tdep.type == dep.type &&
-					tdep.resource == dep.resource
+					tdep.resource == dep.resource &&
+					tdep
 				) {
 					firable[tdep_i].union(this.deps[dep_i]);
 					found = true;
 					break;
 				}
 			}
+			*/
 			if(!found) {
 				firable.push(dep);
 			}
@@ -179,3 +188,19 @@ export class Dependencies {
 		});
 	}
 }
+
+function relatedQuery({model, resource, id, path}) {
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+

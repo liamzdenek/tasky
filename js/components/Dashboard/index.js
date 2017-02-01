@@ -11,13 +11,15 @@ let Dashboard = {
 
 		let deps = new Dependencies(model);
 		let user = deps.get(cond.logged_user).resolve();
-		//let orgs = deps.get(cond.logged_user_orgs).or(cond.goto_logout).resolve();
+		let orgs = deps.get(cond.logged_user_orgs).resolve();
 
 		deps.done();
 
-		if(!user || !orgs) { return <div>Empty Page</div>; }
+		if(!user) { return <div>Empty Page</div>; }
 
-		return <div>Hello Dashboard {context.resource.users["1"].attributes.email}</div>
+		if(!orgs) { return <div>Create or join an org</div>; }
+
+		return <div>Hello Dashboard {user.attributes.email}</div>
 	}
 }
 export default Dashboard;

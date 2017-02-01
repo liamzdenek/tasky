@@ -1,15 +1,38 @@
 import {http_jsonapi} from 'sagas'
 import {redirect, redirect_now} from 'components/RouterSingleton';
-import {require} from 'components/Resource'
+import {relatedQuery} from 'components/Resource'
 import {BASE_URL} from 'util/config'
+import {getSessionUserId} from 'components/Session'
 
 export function logged_user(model) {
 	return {
 		type: "RESOURCE.REQUIRE",
 		resource: "users",
-		ids: [model.context.session.user_id],
+		ids: [getSessionUserId(model)],
 		get: () => {
-			//return model.context.
+			let cache = model.context.resource.cache;
+			if(!cache || !cache.users) { return };
+			return cache.users[model.context.session.user_id];
+		}
+	}
+}
+
+export function logged_user_orgs(model) {
+	return {
+		type: "RESOURCE.REQUIRE",
+		resource: "users",
+		ids: [getSessionUserId(model)],
+		include: ["org_join", "org_join.org"],
+		get: () => {
+			return relatedQuery({
+				model,
+				resource: "users",
+				id: getSessionUserId(model),
+				path: "org_join.org",
+			})
+			//let cache = model.context.resource.cache;
+			//if(!cache || !cache.users) { return };
+			//return cache.users[model.context.session.user_id];
 		}
 	}
 }

@@ -4,6 +4,14 @@ import {http_jsonapi} from 'util/saga-http'
 import {mountSaga} from 'sagas'
 import {mountReducer} from 'reducer'
 
+export function getSessionToken({context}) {
+	return context.session.token;
+}
+
+export function getSessionUserId({context}) {
+	return context.session.user_id;
+}
+
 export function setSession(dispatch, token, user_id) {
 	return dispatch({
 		type: "SESSION_SET",
@@ -15,7 +23,7 @@ export function setSession(dispatch, token, user_id) {
 export default function reducer(state, action) {
 	state = state || { // || {}
 		token: "123e4567-e89b-12d3-a456-426655440000",
-		user_id: 1,
+		user_id: "1",
 	};
 	if(action.type == "SESSION_SET") {
 		state = {
