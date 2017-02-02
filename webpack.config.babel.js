@@ -28,7 +28,11 @@ module.exports = {
 					'style-loader',
 					{
 						loader: 'css-loader',
-						options: { root: '.', modules: true }
+						options: {
+							root: '.',
+							localIdentName: '[path][name]__[local]--[hash:base64:5]',
+							modules: true
+						}
 					}
 				],
 			}, {

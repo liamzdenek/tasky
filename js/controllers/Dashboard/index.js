@@ -5,7 +5,6 @@ import PageWrap from 'controllers/PageWrap'
 
 const cond = require('util/conditions');
 
-
 let Dashboard = {
 	render: (model) => {
 		let {dispatch, context} = model;
