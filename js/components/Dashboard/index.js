@@ -19,7 +19,7 @@ let Dashboard = {
 
 		if(!orgs) { return <div>Create or join an org</div>; }
 
-		return <div>Hello Dashboard {user.attributes.email}</div>
+		return <div>Hello Dashboard {user.attributes.email} <br/> {JSON.stringify(orgs)}</div>
 	}
 }
 export default Dashboard;

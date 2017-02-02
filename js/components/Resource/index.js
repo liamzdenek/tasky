@@ -15,6 +15,7 @@ export function compareRequires(r1, r2) {
 export default function reducer(state, action) {
 	state = state || {
 		pending: [],
+		completed: [],
 		cache: {},
 	}
 
@@ -28,6 +29,9 @@ export default function reducer(state, action) {
 
 		state = Object.assign({}, state, {pending}); 
 	}
+	else if(action.type.startsWith("router.")) {
+		state = Object.assign({}, state, {completed: []})
+	}
 	else if(action.type == "RESOURCE.STORE") {
 		if(state.pending) {
 			let i = state.pending.findIndex((p) => compareRequires(p, action.action));
@@ -35,7 +39,15 @@ export default function reducer(state, action) {
 				...state.pending.slice(0,i),
 				...state.pending.slice(i+1)
 			]
-			state = Object.assign({}, state, {pending});
+
+			let completed = state.completed || []; 
+			
+			completed = [
+				action.action,
+				...completed,
+			]
+
+			state = Object.assign({}, state, {pending}, {completed});
 		}
 		console.log("REDUCER GOT MATCH: ", action);		
 
@@ -119,6 +131,10 @@ export class Dependency {
 		return this;
 	}
 	getDispatch() {
+		console.log("GET IS: ", this.get);
+		if(Array.isArray(this.get) && this.get.length == 0) {
+			return this.instruction;
+		}
 		if(this.get != null) {
 			return null;
 		}
@@ -150,10 +166,14 @@ export class Dependencies {
 	}
 	done() {
 		let firable = [];
+		console.log("TRYING TO FIRE: ", this.deps);
 		for(let dep_i in this.deps) {
 			let dep = this.deps[dep_i].getDispatch();
 			if(!dep) {
-				continue;
+				if(dep === null) {
+					continue;
+				}
+				throw new Error("getDispatch() returned an empty value: "+dep);
 			}
 			let found = false;
 			/*
@@ -177,8 +197,14 @@ export class Dependencies {
 		console.log("FIRING: ", firable);
 		firable.forEach((f) => {
 			if(this.model.context.resource) {
-				let pending = this.model.context.resource.pending;
-				if(pending && pending.find((t) => compareRequires(f,t))) {
+				let union;
+				let pending = union = this.model.context.resource.pending || [];
+				
+				let completed = this.model.context.resource.completed;
+				if(completed) {
+					union = pending.concat(completed);
+				}
+				if(union.find((t) => compareRequires(f,t))) {
 					return;
 				}
 			}
@@ -189,8 +215,48 @@ export class Dependencies {
 	}
 }
 
-function relatedQuery({model, resource, id, path}) {
-	
+export function relatedQuery({model, resource, id, path, isSingular=false}) {
+	let cache = model.context.resource.cache;
+	if(!cache) {
+		return null;
+	}
+	let output = [];
+	let queue = [];
+	queue.push({
+		resource,
+		id,
+		path: path.split('.'),
+	})
+
+	while(queue.length) {
+		let next = queue.shift();
+		let resource_cache = cache[next.resource];
+		if(!resource_cache) { continue; }
+		let record = cache[next.resource][next.id];
+		if(!record) { continue; }
+		console.log("RECORD: ", record);
+		
+		if(next.path.length == 0) {
+			output.push(record);
+		} else {
+			let rel = record.relationships[next.path[0]] 
+			if(!rel.data) { continue; }
+			let links = rel.data;
+			let path = next.path.slice(1)
+			if(!Array.isArray(links)) { links = [links]; } 
+			links.forEach(function(link) {
+				queue.push({
+					resource: link.type,
+					id: link.id,
+					path,
+				})
+			})
+		}
+	}
+	if(isSingular) {
+		return output.length > 0 ? output[0] : null;
+	}
+	return output;
 }
 
 
