@@ -1,6 +1,7 @@
 const {element} = require('deku')
 import {redirect, redirect_now} from 'components/RouterSingleton';
 import {Dependencies} from 'components/Resource'
+import PageWrap from 'controllers/PageWrap'
 
 const cond = require('util/conditions');
 
@@ -19,7 +20,7 @@ let Dashboard = {
 
 		if(!orgs) { return <div>Create or join an org</div>; }
 
-		return <div>Hello Dashboard {user.attributes.email} <br/> {JSON.stringify(orgs)}</div>
+		return <PageWrap>Hello Dashboard {user.attributes.email} <br/> {JSON.stringify(orgs)}</PageWrap>
 	}
 }
 export default Dashboard;

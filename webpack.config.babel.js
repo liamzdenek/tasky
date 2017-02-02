@@ -23,12 +23,21 @@ module.exports = {
 				test: /\.json$/,
 				loader: 'json-loader'
 			}, {
+				test: /\.css$/,
+				loaders: [
+					'style-loader',
+					{
+						loader: 'css-loader',
+						options: { root: '.', modules: true }
+					}
+				],
+			}, {
 				// Do not transform vendor's CSS with CSS-modules
 				// The point is that they remain in global scope.
 				// Since we require these CSS files in our JS or CSS files,
 				// they will be a part of our compilation either way.
 				// So, no need for ExtractTextPlugin here.
-				test: /\.css$/,
+				test: /(\.global)?\.css$/,
 				include: /node_modules/,
 				loaders: ['style-loader', 'css-loader'],
 			}, {
