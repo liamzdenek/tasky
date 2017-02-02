@@ -3,7 +3,7 @@ import {createStore, applyMiddleware} from 'redux'
 import reducer from './reducer'
 
 import {setup_router} from 'components/RouterSingleton'
-import App from 'components/App'
+import App from 'controllers/App'
 
 import saga from './sagas'
 import createSagaMiddleware from 'redux-saga'

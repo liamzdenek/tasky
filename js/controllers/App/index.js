@@ -1,8 +1,8 @@
 const {element} = require('deku')
 
 import {Router, Route, redirect, redirect_now} from 'components/RouterSingleton';
-import Login from 'components/Login';
-import Dashboard from 'components/Dashboard';
+import Login from 'controllers/Login';
+import Dashboard from 'controllers/Dashboard';
 
 
 let App = {
