@@ -13,12 +13,12 @@ let PageWrap = {
 
 		let deps = new Dependencies(model);
 		let user = deps.get(cond.logged_user).resolve();
+		let orgs = deps.get(cond.logged_user_orgs).resolve();
 
 		deps.done()
 
+		// todo: replace this with pure css
 		let show_menu = new Variable(model, "show_menu", {default: false});
-
-		console.log("SHOW MENU: ", show_menu.value);
 
 		return <div>
 			<div class={css.header}>
@@ -32,7 +32,11 @@ let PageWrap = {
 			{show_menu.value &&
 				<div class={css.zeroheight} >
 					<div class={css.right+" "+css.orgs}>
-						Orgs go here
+						{orgs.map((org) => {
+							return <div class={css.org}>
+								{org.attributes.name || "Internal Error getting org name"}
+							</div>
+						})}
 					</div>
 				</div>
 				||
