@@ -3,10 +3,9 @@ import {BASE_URL} from 'util/config'
 import {http_jsonapi} from 'util/saga-http'
 import {mountSaga} from 'sagas'
 import {mountReducer} from 'reducer'
-console.log("REDUCER: ", require('reducer'));
 
 export function compareRequires(r1, r2) {
-	console.log("COMPARING: ", r1, r2);
+	//console.log("COMPARING: ", r1, r2);
 	return r1.type == r2.type &&
 		r1.resource == r2.resource &&
 		r1.ids.every((v,i) => r2.ids[i] == v)
@@ -49,7 +48,6 @@ export default function reducer(state, action) {
 
 			state = Object.assign({}, state, {pending}, {completed});
 		}
-		console.log("REDUCER GOT MATCH: ", action);		
 
 		let rows = action.json.data;
 		if(!Array.isArray(rows)) {
@@ -89,7 +87,6 @@ export default function reducer(state, action) {
 		state = Object.assign({}, state, {cache: nstate});
 		*/
 	}
-	console.log("NEW STATE: ", state);
 	return state;
 }
 mountReducer({resource: reducer});
@@ -100,7 +97,7 @@ function* watch_resource_require(action) {
 		url += '?include='+action.include.join(',');
 	}
 	let [response, json] = yield call(http_jsonapi, url, {})
-    console.log("ID REQUIRE RES: ", response, json);
+    //console.log("ID REQUIRE RES: ", response, json);
     if(!json.data) {
         return;
     }
@@ -121,6 +118,7 @@ export class Dependency {
 	set instruction(i) { this._instruction = i }
 	get get() {
 		if(this._get) { return this._get }
+		if(!this.instruction) { return null }
 		return this._get = this.instruction.get();
 	}
 	constructor(instruction) {
@@ -131,7 +129,6 @@ export class Dependency {
 		return this;
 	}
 	getDispatch() {
-		console.log("GET IS: ", this.get);
 		if(Array.isArray(this.get) && this.get.length == 0) {
 			return this.instruction;
 		}
@@ -156,17 +153,21 @@ export class Dependencies {
 		this.deps = [];
 	}
 	get(args) {
+		let result = args(this.model);
+		if(result === undefined || result === null) {
+			return new Dependency(null);
+		}
 		if(!args || typeof args != "function") {
 			console.log("Dependencies cannot .get(args) where args= ", args);
 			throw new Error("Dependencies cannot .get(args) where args= "+args);
 		}
-		let dep = new Dependency(args(this.model));
+		let dep = new Dependency(result);
 		this.deps.push(dep);
 		return dep;
 	}
 	done() {
 		let firable = [];
-		console.log("TRYING TO FIRE: ", this.deps);
+		//console.log("TRYING TO FIRE: ", this.deps);
 		for(let dep_i in this.deps) {
 			let dep = this.deps[dep_i].getDispatch();
 			if(!dep) {
@@ -194,7 +195,8 @@ export class Dependencies {
 				firable.push(dep);
 			}
 		}
-		console.log("FIRING: ", firable);
+		//console.log("FIRING: ", firable);
+		let all_completed = true;
 		firable.forEach((f) => {
 			if(this.model.context.resource) {
 				let union;
@@ -208,25 +210,39 @@ export class Dependencies {
 					return;
 				}
 			}
+			all_completed = false;
 
-			console.log("Event has not been fired before");
+			//console.log("Event has not been fired before");
 			this.model.dispatch(f)
 		});
+		return all_completed;
 	}
 }
 
-export function relatedQuery({model, resource, id, path, isSingular=false}) {
+export function relatedQuery({model, resource, id, path="", isSingular=false}) {
 	let cache = model.context.resource.cache;
 	if(!cache) {
 		return null;
 	}
 	let output = [];
 	let queue = [];
-	queue.push({
-		resource,
-		id,
-		path: path.split('.'),
-	})
+	if(id != null) {
+		queue.push({
+			resource,
+			id,
+			path: path.split('.'),
+		})
+	} else {
+		if(cache[resource]) {
+			for(let id in cache[resource]) {
+				queue.push({
+					resource,
+					id,
+					path: path.split('.'),
+				})
+			}
+		}
+	}
 
 	while(queue.length) {
 		let next = queue.shift();
@@ -236,7 +252,7 @@ export function relatedQuery({model, resource, id, path, isSingular=false}) {
 		if(!record) { continue; }
 		console.log("RECORD: ", record);
 		
-		if(next.path.length == 0) {
+		if(next.path.length == 0 || (next.path.length == 1 && next.path[0] == "")) {
 			output.push(record);
 		} else {
 			let rel = record.relationships[next.path[0]] 
