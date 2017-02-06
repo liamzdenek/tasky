@@ -21,7 +21,7 @@ const IndexPage = {
 		deps.done();
 
 		if(user) {
-			redirect_now(dispatch, "/dashboard");
+			redirect_now(model, "/dashboard");
 			return <div/>
 		}
 
@@ -29,13 +29,13 @@ const IndexPage = {
 		if(model.props.page == "register") {
 			page = <div>
 				<Register>
-					<A onClick={redirect(dispatch, "/", {page:"login"})}>Or, Log In</A>
+					<A onClick={redirect(model, "/", {page:"login"})}>Or, Log In</A>
 				</Register>
 			</div>
 		} else {
 			page = <div>
 				<Login>
-					<A onClick={redirect(dispatch, "/", {page:"register"})}>Or, Register</A>
+					<A onClick={redirect(model, "/", {page:"register"})}>Or, Register</A>
 				</Login>
 			</div>
 		}

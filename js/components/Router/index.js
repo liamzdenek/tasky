@@ -88,8 +88,8 @@ function reducer(options) {
 
 function get_redirectors(prefix) {
 
-	let redirect_now = (dispatch, uri, props={}) => {
-        dispatch({
+	let redirect_now = (model, uri, props={}) => {
+        model.dispatch({
 			type: prefix+'.push',
 			uri: uri,
 			props: props,
@@ -97,7 +97,7 @@ function get_redirectors(prefix) {
 	};
 	return {
 		redirect_now,
-		redirect: (dispatch, uri, props) => event => redirect_now(dispatch, uri, props)
+		redirect: (model, uri, props) => event => redirect_now(model, uri, props)
 	}
 
 }

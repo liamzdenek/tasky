@@ -16,12 +16,12 @@ let Dashboard = {
 		deps.done();
 
 		if(!user) {
-			redirect_now(dispatch, "/");	
+			redirect_now(model, "/");	
 			return <div>Empty Page</div>;
 		}
 
 		if(!orgs || orgs.length == 0) {
-			redirect_now(dispatch, "/first_login");
+			redirect_now(model, "/first_login");
 			return <div>Create or join an org</div>;
 		}
 
