@@ -3,12 +3,21 @@ import {relatedQuery} from 'components/Resource'
 
 export function getFocusedOrg(model) {
 	let {context} = model;
-	if(context.focusedorg) { return context.focusedorg.id; }
+	if(context.focusedorg && context.focusedorg.id) {
+		return relatedQuery({
+			model,
+			resource: "orgs",
+			isSingular: true,
+			ids: [context.focusedorg.id],
+		})
+	}
+	
 	let org = relatedQuery({
 		model,
 		resource: "orgs",
 		isSingular: true,
 	})
+	console.log("RELATEDQUERY ORG: ", org);
 	return org;
 }
 

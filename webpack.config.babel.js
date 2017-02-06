@@ -24,13 +24,14 @@ module.exports = {
 				loader: 'json-loader'
 			}, {
 				test: /\.css$/,
+				exclude: /node_modules/,
 				loaders: [
 					'style-loader',
 					{
 						loader: 'css-loader',
 						options: {
 							root: '.',
-							localIdentName: '[path][name]__[local]--[hash:base64:5]',
+							localIdentName: '[local]__[path][name]--[hash:base64:10]',
 							modules: true
 						}
 					}
@@ -41,9 +42,19 @@ module.exports = {
 				// Since we require these CSS files in our JS or CSS files,
 				// they will be a part of our compilation either way.
 				// So, no need for ExtractTextPlugin here.
-				test: /(\.global)?\.css$/,
+				test: /\.css$/,
 				include: /node_modules/,
-				loaders: ['style-loader', 'css-loader'],
+				loaders: [
+					'style-loader',
+					{
+						loader: 'css-loader',
+						options: {
+							root: '.',
+							localIdentName: '[local]',
+							modules: true
+						}
+					}
+				],
 			}, {
 				test: /\.(eot|svg|ttf|woff|woff2)$/,
 				loader: 'file-loader',

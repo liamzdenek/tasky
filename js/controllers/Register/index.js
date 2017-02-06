@@ -6,7 +6,7 @@ import PageWrap from 'controllers/PageWrap';
 import {Submit} from 'pure/Buttons';
 import {Controls, AlignedInput} from 'pure/Forms'
 
-const ontrylogin = model => (fields, ev) => {
+const ontryregister = model => (fields, ev) => {
 	let {email, password} = fields;
     let {path, dispatch} = model;
     dispatch({
@@ -16,9 +16,8 @@ const ontrylogin = model => (fields, ev) => {
     })
 }
 
-
-let Login = {
-    render: (model) => {
+const Register = {
+	render: (model) => {
         let {context, dispatch, path, children} = model;
 
 		let validate = {
@@ -27,21 +26,20 @@ let Login = {
 		}
 
         return <div> 
-            <h1>Login</h1>
-			<FormStatus name="loginform"/>
-            <Form onSubmit={ontrylogin(model)} name="loginform" validate={validate} aligned>
+            <h1>Register</h1>
+			<FormStatus name="registerform"/>
+            <Form onSubmit={ontryregister(model)} name="registerform" validate={validate} aligned>
 				<fieldset>
-					<AlignedInput label="Email" name="email" value="test2@test.com"/>
-					<AlignedInput label="Password" name="password" type="password" value="testaroo" />
-					<Controls>
-						<Submit value="Login" primary/>
+					<AlignedInput label="Email" name="email"/>
+					<AlignedInput label="Password" name="password" type="password"/>
+                	<Controls>
+						<Submit value="Register" primary/>
 						{" "}
 						{children}
 					</Controls>
 				</fieldset>
             </Form>
         </div>
-    }
+	}
 }
-
-export default Login;
+export default Register;

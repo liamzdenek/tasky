@@ -19,16 +19,20 @@ export function logged_user(model) {
 
 export function logged_user_orgs(model) {
 	const {getSessionUserId} = require('components/Session')
+	let user_id = getSessionUserId(model);
+	if(!user_id) {
+		return null;
+	}
 	return {
 		type: "RESOURCE.REQUIRE",
 		resource: "users",
-		ids: [getSessionUserId(model)],
+		ids: [user_id],
 		include: ["org_join", "org_join.org"],
 		get: () => {
 			return relatedQuery({
 				model,
 				resource: "users",
-				id: getSessionUserId(model),
+				id: user_id,
 				path: "org_join.org",
 			})
 		}
@@ -37,8 +41,10 @@ export function logged_user_orgs(model) {
 
 export function focused_org(model) {
 	const {getFocusedOrg, getFocusedOrgId} = require('controllers/FocusedOrg');
-	if(getFocusedOrgId(model) == null) {
-		return;
+	let focused_id = getFocusedOrgId(model);
+	if(focused_id == null) {
+		return null;
+		//return Object.assign({}, logged_user_orgs(model), {get: () => getFocusedOrg(model)});
 	}
 	return {
 		type: "RESOURCE.REQUIRE",

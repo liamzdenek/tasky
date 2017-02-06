@@ -15,9 +15,15 @@ let Dashboard = {
 
 		deps.done();
 
-		if(!user) { return <div>Empty Page</div>; }
+		if(!user) {
+			redirect_now(dispatch, "/");	
+			return <div>Empty Page</div>;
+		}
 
-		if(!orgs) { return <div>Create or join an org</div>; }
+		if(!orgs || orgs.length == 0) {
+			redirect_now(dispatch, "/first_login");
+			return <div>Create or join an org</div>;
+		}
 
 		return <PageWrap>Hello Dashboard {user.attributes.email} <br/> {JSON.stringify(orgs)}</PageWrap>
 	}

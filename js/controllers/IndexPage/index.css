@@ -1,0 +1,8 @@
+.modal-parent {
+	justify-content: center;
+}
+
+.modal {
+	padding: 15px 25px;
+	border: 1px solid black;
+}

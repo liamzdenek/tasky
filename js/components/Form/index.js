@@ -1,6 +1,7 @@
 import {element} from 'deku'
 import validator from 'validator';
 import {mountReducer} from 'reducer'
+import PureForm from 'pure/Forms'
 
 export const Validators = {
 	isEmail: ({value, push}) => {
@@ -81,12 +82,18 @@ const Form = {
 	},
 	render: (model) => {
 		console.log("MODEL: ", model);
-		let form = <form id={model.path}>
-			{model.children}
-		</form>;
-		console.log("EARLY FORM: ", form);
-		form.attributes = Object.assign({}, form.attributes, model.props);
-		form.attributes.onSubmit = Form.onFormSubmit(model);
+		let form;
+		if(model.props.nopure) {
+			form = <form id={model.path} onSubmit={Form.onFormSubmit(model)}>
+				{model.children}
+			</form>;
+		} else {
+			form = element.apply(null,[
+				PureForm,
+				Object.assign({}, model.props, {id:model.path, onSubmit: Form.onFormSubmit(model)}),
+				...model.children
+			]);
+		}
 		console.log("FORM: ", form);
 		return form;
 	}

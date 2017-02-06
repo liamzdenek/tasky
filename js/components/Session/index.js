@@ -21,10 +21,13 @@ export function setSession(dispatch, token, user_id) {
 }
 
 export default function reducer(state, action) {
-	state = state || { // || {}
+	state = state || {};
+	/*
+	state = state || {
 		token: "123e4567-e89b-12d3-a456-426655440000",
 		user_id: "1",
 	};
+	*/
 	if(action.type == "SESSION.SET") {
 		state = {
 			token: action.token,

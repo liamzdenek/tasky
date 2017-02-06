@@ -7,6 +7,8 @@ import {setFocusedOrgById} from 'controllers/FocusedOrg'
 
 const cond = require('util/conditions');
 
+import Grid, {Col} from 'pure/Grids';
+import Menu, {MenuList, MenuItem, MenuLink} from 'pure/Menus';
 
 let PageWrap = {
 	render: (model) => {
@@ -19,8 +21,7 @@ let PageWrap = {
 
 		let all_reqs_done = deps.done()
 
-		console.log("FOCUSED ORG: ", focused_org);
-		console.log("ORGS: ", orgs);
+		console.log("PageWrap user: ", user);
 
 		// todo: replace this with pure css
 		let show_menu = new Variable(model, "show_menu", {default: false});
@@ -29,6 +30,22 @@ let PageWrap = {
 			show_menu.value = !show_menu.value;
 		}
 
+		let menu = () => {
+			return <MenuLink heading>
+				{user ? focused_org ? focused_org.attributes.name : "[No Org Selected]" : "Tasky"}
+			</MenuLink>
+		}
+
+		return <Grid>
+			<Col fraction="1" class={css.header}>
+				<Menu horizontal class={css.menu}>
+					{model.props.disabled ? <MenuLink/> : menu()}
+				</Menu>
+			</Col>
+			<Col fraction="1" class={css.content}>{children}</Col>
+		</Grid>
+
+		/*
 		let menu = () => {
 			let items = orgs.map((org) => {
 				return <div onClick={() => setFocusedOrgById(model, org.id)} class={css.org}>
@@ -50,7 +67,7 @@ let PageWrap = {
 		return <div>
 			<div class={css.header}>
 				<div class={css.left+" "+css.welcome}>
-					Hello
+					{focused_org ? focused_org.attributes.name : "[No Org Selected]"}
 				</div>
 				<div class={css.right+" "+css.box} onClick={menuClick}>
 					<div class={css.letter}>
@@ -63,6 +80,7 @@ let PageWrap = {
 				{children}
 			</div>
 		</div>
+		*/
 	}
 }
 export default PageWrap;

@@ -4,15 +4,19 @@
 
 .header {
 	height: 50px;
-	background-color: #A9A9A9;
+	background-color: #F1F1F1;
 	padding: 8px;
+}
+.menu {
+	line-height: 34px;
 }
 
 .content {
-	margin: 0 auto;
-	padding: 10px;
-	max-width: 1200px;
+	padding: 10px 30px;
 }
+
+
+
 
 .right {
 	float: right;

@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "deku": "^2.0.0-rc16",
+    "purecss": "^0.6.2"
+  }
+}
