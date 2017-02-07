@@ -1,6 +1,6 @@
 import { call, put, select, takeEvery } from 'redux-saga/effects'
 import {BASE_URL} from 'util/config'
-import {http_jsonapi} from 'util/saga-http'
+import http_jsonapi from './http_jsonapi'
 import {mountSaga} from 'sagas'
 import {mountReducer} from 'reducer'
 
@@ -275,7 +275,47 @@ export function relatedQuery({model, resource, id, path="", isSingular=false}) {
 	return output;
 }
 
+export function resource_request(args) {
+	console.log("DISPATCHING REQUEST: ", request);
+	let {model, request} = args;
+	let {dispatch} = model;
+	delete request.model;
+	return new Promise((resolve,reject) => {
+		dispatch({
+			type: "RESOURCE.HTTP",
+			request: request,
+			cb: (json, response) => {
+				resolve({json, response});
+			}
+		})
+	})
+}
 
+function* resource_http(action) {
+	let {request} = action;
+	let method = "GET";
+
+	let url = BASE_URL;
+
+	if(request.type == "create") {
+		method = "POST";
+	}
+
+	if(request.resource) {
+		url += "/"+request.resource;
+	}
+
+	let [response, json] = yield call(http_jsonapi, url, {
+        method,
+        json: request.json
+	})
+	action.cb(json, response);
+}
+
+function* watch() {
+	yield takeEvery('RESOURCE.HTTP', resource_http);
+}
+mountSaga(watch);
 
 
 

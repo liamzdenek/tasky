@@ -5,15 +5,11 @@ import Form, {FormStatus, Validators} from 'components/Form'
 import PageWrap from 'controllers/PageWrap';
 import {Submit} from 'pure/Buttons';
 import {Controls, AlignedInput} from 'pure/Forms'
+import {login} from 'components/Session';
 
 const ontrylogin = model => (fields, ev) => {
-	let {email, password} = fields;
-    let {path, dispatch} = model;
-    dispatch({
-        type: "HTTP_LOGIN",
-        email,
-        password,
-    })
+	console.log("ON TRY LOGIN");
+	return login(model, fields);
 }
 
 

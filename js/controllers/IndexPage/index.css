@@ -5,4 +5,5 @@
 .modal {
 	padding: 15px 25px;
 	border: 1px solid black;
+	min-width: 400px;
 }
