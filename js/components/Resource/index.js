@@ -92,6 +92,7 @@ export default function reducer(state, action) {
 mountReducer({resource: reducer});
 
 function* watch_resource_require(action) {
+	console.log("GOT RESOURCE REQUIRE: ", action);
 	let url = BASE_URL+'/'+action.resource+'/'+action.ids.join(',');
 	if(action.include) {
 		url += '?include='+action.include.join(',');
@@ -273,22 +274,6 @@ export function relatedQuery({model, resource, id, path="", isSingular=false}) {
 		return output.length > 0 ? output[0] : null;
 	}
 	return output;
-}
-
-export function resource_request(args) {
-	console.log("DISPATCHING REQUEST: ", request);
-	let {model, request} = args;
-	let {dispatch} = model;
-	delete request.model;
-	return new Promise((resolve,reject) => {
-		dispatch({
-			type: "RESOURCE.HTTP",
-			request: request,
-			cb: (json, response) => {
-				resolve({json, response});
-			}
-		})
-	})
 }
 
 function* resource_http(action) {

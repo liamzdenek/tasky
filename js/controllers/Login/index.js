@@ -5,13 +5,11 @@ import Form, {FormStatus, Validators} from 'components/Form'
 import PageWrap from 'controllers/PageWrap';
 import {Submit} from 'pure/Buttons';
 import {Controls, AlignedInput} from 'pure/Forms'
-import {login} from 'components/Session';
+import {login} from 'components/Session/Factory';
 
 const ontrylogin = model => (fields, ev) => {
-	console.log("ON TRY LOGIN");
 	return login(model, fields);
 }
-
 
 let Login = {
     render: (model) => {

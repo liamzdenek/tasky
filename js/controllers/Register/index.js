@@ -5,15 +5,11 @@ import Form, {FormStatus, Validators} from 'components/Form'
 import PageWrap from 'controllers/PageWrap';
 import {Submit} from 'pure/Buttons';
 import {Controls, AlignedInput} from 'pure/Forms'
+import {register} from 'controllers/UserModel/Factory'
 
 const ontryregister = model => (fields, ev) => {
-	let {email, password} = fields;
-    let {path, dispatch} = model;
-    dispatch({
-        type: "HTTP_LOGIN",
-        email,
-        password,
-    })
+	console.log("ON TRY REGISTER: ", fields);
+	register(model, fields);
 }
 
 const Register = {
@@ -30,8 +26,8 @@ const Register = {
 			<FormStatus name="registerform"/>
             <Form onSubmit={ontryregister(model)} name="registerform" validate={validate} aligned>
 				<fieldset>
-					<AlignedInput label="Email" name="email"/>
-					<AlignedInput label="Password" name="password" type="password"/>
+					<AlignedInput label="Email" name="email" value="a@a.a"/>
+					<AlignedInput label="Password" name="pw_hash" type="password" value="password"/>
                 	<Controls>
 						<Submit value="Register" primary/>
 						{" "}

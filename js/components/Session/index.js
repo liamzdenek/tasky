@@ -3,7 +3,6 @@ import {BASE_URL} from 'util/config'
 import {http_jsonapi} from 'util/saga-http'
 import {mountSaga} from 'sagas'
 import {mountReducer} from 'reducer'
-import {resource_request} from 'components/Resource';
 
 export function getSessionToken({context}) {
 	return context.session.token;
@@ -13,30 +12,11 @@ export function getSessionUserId({context}) {
 	return context.session.user_id;
 }
 
-export function setSession(dispatch, token, user_id) {
-	return dispatch({
+export function setSession(model, token, user_id) {
+	return model.dispatch({
 		type: "SESSION.SET",
 		token: token,
 		user_id: user_id,
-	})
-}
-
-export function login(model, fields) {
-	console.log("CALLING RESOURCE_REQUEST");
-	resource_request({
-		model,
-		request: {
-			type: "create",
-			resource: "session",
-			json: {
-				data: {
-					type: "session",
-					attributes: fields,
-				}
-			}
-		}
-	}).then(({json, response}) => {
-		console.log('LOGIN JSON: ', json);
 	})
 }
 
