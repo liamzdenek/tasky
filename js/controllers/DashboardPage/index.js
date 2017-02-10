@@ -13,7 +13,12 @@ let Dashboard = {
 		let user = deps.get(cond.logged_user).resolve();
 		let orgs = deps.get(cond.logged_user_orgs).resolve();
 
-		deps.done();
+		if(!deps.done()) {
+			console.log("DASHBOARD NOT DONE");
+			return <div/>
+		} else {
+			console.log("DASHBOARD DONE");
+		}
 
 		if(!user) {
 			redirect_now(model, "/");	
@@ -24,6 +29,7 @@ let Dashboard = {
 			redirect_now(model, "/first_login");
 			return <div>Create or join an org</div>;
 		}
+		console.log("DASHBOARD RENDERING MAIN");
 
 		return <PageWrap>Hello Dashboard {user.attributes.email} <br/> {JSON.stringify(orgs)}</PageWrap>
 	}

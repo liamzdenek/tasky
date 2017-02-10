@@ -48,6 +48,7 @@ function reducer(options) {
     }, options);
     
     return (state, action) => {
+		let sstate = state;
         if(!state) {
             let route = history.state
             if(window.location.hash) {
@@ -81,6 +82,14 @@ function reducer(options) {
             case options.type+".pop":
                 //window.history.back();
         }
+
+		if(state != sstate) {
+			console.log("%c"+"Rerouting",
+				"color: green;font-weight:bold;",
+				"\n"+"Old State: ", sstate,
+				"\n"+"New State: ", state
+			);
+		}
 
         return state;
     }

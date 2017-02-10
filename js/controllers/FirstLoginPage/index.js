@@ -9,7 +9,7 @@ const FirstLoginPage = {
 		let deps = new Dependencies(model);
 		let user = deps.get(cond.logged_user).resolve();
 
-		deps.done();
+		if(!deps.done()) { return <div/> }
 
 		if(!user) {
 			redirect_now(model, "/");

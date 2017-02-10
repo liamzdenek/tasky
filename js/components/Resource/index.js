@@ -99,7 +99,7 @@ function* watch_resource_require(action) {
 	}
 	let [response, json] = yield call(http_jsonapi, url, {})
     //console.log("ID REQUIRE RES: ", response, json);
-    if(!json.data) {
+    if(json.errors) {
         return;
     }
 	return yield put({
@@ -196,13 +196,14 @@ export class Dependencies {
 		firable.forEach((f) => {
 			if(this.model.context.resource) {
 				let union;
-				let pending = union = this.model.context.resource.pending || [];
+				let pending = this.model.context.resource.pending || [];
 				
-				let completed = this.model.context.resource.completed;
-				if(completed) {
-					union = pending.concat(completed);
+				let completed = this.model.context.resource.completed || [];
+				if(completed.find((t) => compareRequires(f,t))) {
+					return;
 				}
-				if(union.find((t) => compareRequires(f,t))) {
+				if(pending.find((t) => compareRequires(f,t))) {
+					all_completed = false;
 					return;
 				}
 			}
