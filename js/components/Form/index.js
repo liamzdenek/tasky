@@ -30,7 +30,7 @@ const Form = {
 		let form = document.getElementById(model.path);
 		let result = [];
 		let validate = model.props.validate;
-		console.log("VALIDATORS: ", validate);
+		//console.log("VALIDATORS: ", validate);
 		if(!validate) {
 			return result;
 		}
@@ -61,7 +61,7 @@ const Form = {
 					}
 				});
 			})
-			console.log("VALIDATE: ", validators, element);
+			//console.log("VALIDATE: ", validators, element);
 				
 		}
 		return result;
@@ -81,7 +81,7 @@ const Form = {
 		}
 	},
 	render: (model) => {
-		console.log("MODEL: ", model);
+		//console.log("MODEL: ", model);
 		let form;
 		if(model.props.nopure) {
 			form = <form id={model.path} onSubmit={Form.onFormSubmit(model)}>
@@ -94,7 +94,7 @@ const Form = {
 				...model.children
 			]);
 		}
-		console.log("FORM: ", form);
+		//console.log("FORM: ", form);
 		return form;
 	}
 };

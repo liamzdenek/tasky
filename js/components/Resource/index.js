@@ -109,11 +109,6 @@ function* watch_resource_require(action) {
 	})
 }
 
-function* watch() {
-	yield takeEvery('RESOURCE.REQUIRE', watch_resource_require)
-}
-mountSaga(watch);
-
 export class Dependency {
 	get instruction() { return this._instruction }
 	set instruction(i) { this._instruction = i }
@@ -298,7 +293,9 @@ function* resource_http(action) {
 }
 
 function* watch() {
+	console.log("WATCH RESOURCE");
 	yield takeEvery('RESOURCE.HTTP', resource_http);
+	yield takeEvery('RESOURCE.REQUIRE', watch_resource_require)
 }
 mountSaga(watch);
 

@@ -20,6 +20,8 @@ const IndexPage = {
 
 		deps.done();
 
+		console.log("COND LOGGED USER: ", user);
+
 		if(user) {
 			redirect_now(model, "/dashboard");
 			return <div/>

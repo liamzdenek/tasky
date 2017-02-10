@@ -17,7 +17,7 @@ export function getFocusedOrg(model) {
 		resource: "orgs",
 		isSingular: true,
 	})
-	console.log("RELATEDQUERY ORG: ", org);
+	//console.log("RELATEDQUERY ORG: ", org);
 	return org;
 }
 
